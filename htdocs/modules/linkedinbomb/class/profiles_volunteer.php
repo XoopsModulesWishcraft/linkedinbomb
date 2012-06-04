@@ -36,33 +36,43 @@ class LinkedinbombProfiles_volunteer extends XoopsObject
 		}
     }
 
+
     function setVar($field, $value) {
-    	switch ($this->vars[$field]['data_type']) {
-    		case XOBJ_DTYPE_ARRAY:
-    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
-    				parent::setVar($field, $value);
-    			break;
-    		default:
-    			if (md5($value)!=md5($this->getVar($field)))
-    				parent::setVar($field, $value);
-    			break;
-    	}
+    	if (isset($this->vars[$field]))
+	    	switch ($this->vars[$field]['data_type']) {
+	    		case XOBJ_DTYPE_ARRAY:
+	    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
+	    				parent::setVar($field, $value);
+	    			break;
+	    		default:
+	    			if (is_array($value))
+		    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
+		    				parent::setVar($field, $value);
+		    		elseif (md5($value)!=md5($this->getVar($field)))
+	    				parent::setVar($field, $value);
+	    			break;
+	    	}
     }
             
     function setVars($arr, $not_gpc=false) {
     	foreach($arr as $field => $value) {
-    		switch ($this->vars[$field]['data_type']) {
-    			case XOBJ_DTYPE_ARRAY:
-    				if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
-    					parent::setVar($field, $value);
-    				break;
-    			default:
-    				if (md5($value)!=md5($this->getVar($field)))
-    					parent::setVar($field, $value);
-    				break;
-    		}
+    		if (isset($this->vars[$field]))
+	    		switch ($this->vars[$field]['data_type']) {
+	    			case XOBJ_DTYPE_ARRAY:
+	    				if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
+	    					parent::setVar($field, $value);
+	    				break;
+	    			default:
+		    			if (is_array($value))
+			    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
+			    				parent::setVar($field, $value);
+			    		elseif (md5($value)!=md5($this->getVar($field)))
+		    				parent::setVar($field, $value);
+	    				break;
+	    		}
     	}	
-    }    
+    }   
+ 
     function getName() {
     	return $this->getVar('street1').', '.$this->getVar('city').', '.$this->getVar('postal-code');
     }
@@ -88,7 +98,11 @@ class LinkedinbombProfiles_volunteer extends XoopsObject
     }
     
     function toArray() {
-    	$ret = parent::toArray();
+    	$ret = array();
+    	foreach(parent::toArray() as $field => $value) {
+    		$ret[str_replace('-', '_', $field)] = $value;
+    	}
+    	
     	if (isset($ret['created'])&&$ret['created']>0) {
     		$ret['created'] = date(_DATESTRING, $ret['created']);
     	}
@@ -102,6 +116,12 @@ class LinkedinbombProfiles_volunteer extends XoopsObject
     		foreach($form as $field => $element) {
     			$ret['form'][$field] = $form[$field]->render();
     		}
+    	} 
+    	if ($ret['organization_id']>0) {
+    		$organization_handler = xoops_getmodulehandler('organization', 'linkedinbomb');
+    		if ($organization = $organization_handler->get($ret['organization_id'])) {
+			    $ret['organization'] = $organization->toArray();
+    		}	  
     	} 
     	return $ret;
     }
@@ -150,7 +170,7 @@ class LinkedinbombProfiles_volunteerHandler extends XoopsPersistableObjectHandle
     	    $criteria = new CriteriaCompo();
     		foreach($object->vars as $field => $values) {
     			if (!in_array($field, array($this->keyName, 'searched', 'polled', 'emailed', 'sms', 'synced', 'created', 'updated')))
-    				if ($values['type']!=XOBJ_DTYPE_ARRAY)	
+    				if ($values['data_type']!=XOBJ_DTYPE_ARRAY)	
     					if (!empty($values['value'])||intval($values['value'])<>0)
     						$criteria->add(new Criteria('`'.$field.'`', $object->getVar($field)));
     		}

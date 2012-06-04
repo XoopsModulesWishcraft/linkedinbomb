@@ -41,33 +41,43 @@ class LinkedinbombProfiles_patents extends XoopsObject
 		}
     }
 
+
     function setVar($field, $value) {
-    	switch ($this->vars[$field]['data_type']) {
-    		case XOBJ_DTYPE_ARRAY:
-    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
-    				parent::setVar($field, $value);
-    			break;
-    		default:
-    			if (md5($value)!=md5($this->getVar($field)))
-    				parent::setVar($field, $value);
-    			break;
-    	}
+    	if (isset($this->vars[$field]))
+	    	switch ($this->vars[$field]['data_type']) {
+	    		case XOBJ_DTYPE_ARRAY:
+	    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
+	    				parent::setVar($field, $value);
+	    			break;
+	    		default:
+	    			if (is_array($value))
+		    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
+		    				parent::setVar($field, $value);
+		    		elseif (md5($value)!=md5($this->getVar($field)))
+	    				parent::setVar($field, $value);
+	    			break;
+	    	}
     }
             
     function setVars($arr, $not_gpc=false) {
     	foreach($arr as $field => $value) {
-    		switch ($this->vars[$field]['data_type']) {
-    			case XOBJ_DTYPE_ARRAY:
-    				if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
-    					parent::setVar($field, $value);
-    				break;
-    			default:
-    				if (md5($value)!=md5($this->getVar($field)))
-    					parent::setVar($field, $value);
-    				break;
-    		}
+    		if (isset($this->vars[$field]))
+	    		switch ($this->vars[$field]['data_type']) {
+	    			case XOBJ_DTYPE_ARRAY:
+	    				if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
+	    					parent::setVar($field, $value);
+	    				break;
+	    			default:
+		    			if (is_array($value))
+			    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
+			    				parent::setVar($field, $value);
+			    		elseif (md5($value)!=md5($this->getVar($field)))
+		    				parent::setVar($field, $value);
+	    				break;
+	    		}
     	}	
-    } 
+    }   
+ 
     function getName() {
     	return $this->getVar('title').' ('.$this->getVar('id').')';
     }
@@ -93,7 +103,11 @@ class LinkedinbombProfiles_patents extends XoopsObject
     }
     
     function toArray() {
-    	$ret = parent::toArray();
+    	$ret = array();
+    	foreach(parent::toArray() as $field => $value) {
+    		$ret[str_replace('-', '_', $field)] = $value;
+    	}
+    	
     	if (isset($ret['created'])&&$ret['created']>0) {
     		$ret['created'] = date(_DATESTRING, $ret['created']);
     	}
@@ -108,6 +122,26 @@ class LinkedinbombProfiles_patents extends XoopsObject
     			$ret['form'][$field] = $form[$field]->render();
     		}
     	} 
+    	if (count($ret['inventors_ids'])>0) {
+    		$profiles_patents_inventors_handler = xoops_getmodulehandler('profiles_patents_inventors', 'linkedinbomb');
+    		foreach($ret['inventors_ids'] as $inventor_id) {
+		        if ($inventor = $profiles_patents_inventors_handler->get($inventor_id)) {
+			    	$ret['inventor'][$inventor_id] = $inventor->toArray();
+			    }
+    		}	  
+    	}
+    	if ($ret['office_id']>0) {
+    		$profiles_patents_office_handler = xoops_getmodulehandler('profiles_patents_office', 'linkedinbomb');
+    		if ($office = $profiles_patents_office_handler->get($ret['office_id'])) {
+			    $ret['office'] = $office->toArray();
+    		}	  
+    	}
+    	if ($ret['status_id']>0) {
+    		$profiles_patents_status_handler = xoops_getmodulehandler('profiles_patents_status', 'linkedinbomb');
+    		if ($status = $profiles_patents_status_handler->get($ret['status_id'])) {
+			    $ret['status'] = $status->toArray();
+    		}	  
+    	}
     	return $ret;
     }
 
@@ -155,7 +189,7 @@ class LinkedinbombProfiles_patentsHandler extends XoopsPersistableObjectHandler
     	    $criteria = new CriteriaCompo();
     		foreach($object->vars as $field => $values) {
     			if (!in_array($field, array($this->keyName, 'searched', 'polled', 'emailed', 'sms', 'synced', 'created', 'updated')))
-    				if ($values['type']!=XOBJ_DTYPE_ARRAY)	
+    				if ($values['data_type']!=XOBJ_DTYPE_ARRAY)	
     					if (!empty($values['value'])||intval($values['value'])<>0)
     						$criteria->add(new Criteria('`'.$field.'`', $object->getVar($field)));
     		}

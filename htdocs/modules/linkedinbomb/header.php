@@ -44,10 +44,6 @@ include_once $GLOBALS['xoops']->path('modules'.DS.'linkedinbomb'.DS.'include'.DS
 
 xoops_loadLanguage('main', 'linkedinbomb');
 
-if ($GLOBALS['linkedinbombModuleConfig']['tag']) {
-	include_once $GLOBALS['xoops']->path('modules'.DS.'tag'.DS.'include'.DS.'formtag.php');
-}
-
 if (!isset($GLOBALS['xoopsTpl']) || !is_object($GLOBALS['xoopsTpl'])) {
 	include_once(XOOPS_ROOT_PATH."/class/template.php");
 	$GLOBALS['xoopsTpl'] = new XoopsTpl();

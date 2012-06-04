@@ -31,7 +31,7 @@
 // ------------------------------------------------------------------------- //
 
 $modversion['name'] = _MI_LINKEDIN_NAME;
-$modversion['version'] = 1.01;
+$modversion['version'] = 1.02;
 $modversion['releasedate'] = "Friday, May 25, 2012";
 $modversion['description'] = _MI_LINKEDIN_DESCRIPTION;
 $modversion['author'] = "Wishcraft";
@@ -72,7 +72,7 @@ $modversion['system_menu'] = 1;
 
 // Admin things
 $modversion['hasAdmin'] = 1;
-$modversion['adminindex'] = "admin/index.php";
+$modversion['adminindex'] = "admin/dashboard.php";
 $modversion['adminmenu'] = "admin/menu.php";
 
 //$modversion['onUpdate'] = "include/update.php";
@@ -233,12 +233,75 @@ $modversion['blocks'][11]['template'] = "twitterbomb_block_tweets.html" ;
 // Templates
 $i=0;
 $i++;
+$modversion['templates'][$i]['file'] = 'linkedinbomb_cpanel_email_list.html';
+$modversion['templates'][$i]['description'] = 'Template for Retrieving Email Address from User';
+$i++;
+$modversion['templates'][$i]['file'] = 'linkedinbomb_cpanel_filter_default.html';
+$modversion['templates'][$i]['description'] = 'Template for Retrieving Email Address from User';
+$i++;
+$modversion['templates'][$i]['file'] = 'linkedinbomb_cpanel_ims_list.html';
+$modversion['templates'][$i]['description'] = 'Template for Retrieving Email Address from User';
+$i++;
+$modversion['templates'][$i]['file'] = 'linkedinbomb_cpanel_persons_list.html';
+$modversion['templates'][$i]['description'] = 'Template for Retrieving Email Address from User';
+$i++;
+$modversion['templates'][$i]['file'] = 'linkedinbomb_cpanel_phones_list.html';
+$modversion['templates'][$i]['description'] = 'Template for Retrieving Email Address from User';
+$i++;
+$modversion['templates'][$i]['file'] = 'linkedinbomb_cpanel_profiles_list.html';
+$modversion['templates'][$i]['description'] = 'Template for Retrieving Email Address from User';
+$i++;
+$modversion['templates'][$i]['file'] = 'linkedinbomb_cpanel_providers_list.html';
+$modversion['templates'][$i]['description'] = 'Template for Retrieving Email Address from User';
+$i++;
 $modversion['templates'][$i]['file'] = 'linkedinbomb_get_email.html';
+$modversion['templates'][$i]['description'] = 'Template for Retrieving Email Address from User';
+$i++;
+$modversion['templates'][$i]['file'] = 'linkedinbomb_profile.html';
 $modversion['templates'][$i]['description'] = 'Template for Retrieving Email Address from User';
 
 // Menu
 
 $i = 0;
+$i++;
+$modversion['config'][$i]['name'] = 'crawlnext';
+$modversion['config'][$i]['title'] = '_MI_LINKEDIN_CRAWLNEXT';
+$modversion['config'][$i]['description'] = '_MI_LINKEDIN_CRAWLNEXT_DESC';
+$modversion['config'][$i]['formtype'] = 'select';
+$modversion['config'][$i]['valuetype'] = 'int';
+$modversion['config'][$i]['default'] = (60*60*24*7);
+$modversion['config'][$i]['options'] = array(_MI_LINKEDIN_TIME_30MINUTES => (60*30), _MI_LINKEDIN_TIME_1HOURS => (60*60*1), _MI_LINKEDIN_TIME_2HOURS => (60*60*2),
+											 _MI_LINKEDIN_TIME_3HOURS => (60*60*3), _MI_LINKEDIN_TIME_6HOURS => (60*60*6), _MI_LINKEDIN_TIME_12HOURS => (60*60*12),
+											 _MI_LINKEDIN_TIME_24HOURS => (60*60*24), _MI_LINKEDIN_TIME_1WEEK => (60*60*24*7), _MI_LINKEDIN_TIME_FORTNIGHT => (60*60*24*7*2), 
+											 _MI_LINKEDIN_TIME_1MONTH => (60*60*24*7*4*1), _MI_LINKEDIN_TIME_2MONTHS => (60*60*24*7*4*2), _MI_LINKEDIN_TIME_3MONTHS => (60*60*24*7*4*3), 
+											 _MI_LINKEDIN_TIME_4MONTHS => (60*60*24*7*4*4), _MI_LINKEDIN_TIME_5MONTHS => (60*60*24*7*4*5), _MI_LINKEDIN_TIME_6MONTHS => (60*60*24*7*4*6),
+											 _MI_LINKEDIN_TIME_12MONTHS => (60*60*24*7*4*12), _MI_LINKEDIN_TIME_24MONTHS => (60*60*24*7*4*24));
+											 
+$i++;
+$modversion['config'][$i]['name'] = 'limitoncrawl';
+$modversion['config'][$i]['title'] = "_MI_LINKEDIN_LIMIT_ON_CRAWL";
+$modversion['config'][$i]['description'] = "_MI_LINKEDIN_LIMIT_ON_CRAWL_DESC";
+$modversion['config'][$i]['formtype'] = 'text';
+$modversion['config'][$i]['valuetype'] = 'int';
+$modversion['config'][$i]['default'] = '10';
+											 
+$i++;
+$modversion['config'][$i]['name'] = 'crawlsort';
+$modversion['config'][$i]['title'] = "_MI_LINKEDIN_CRAWL_SORT";
+$modversion['config'][$i]['description'] = "_MI_LINKEDIN_CRAWL_SORT_DESC";
+$modversion['config'][$i]['formtype'] = 'select';
+$modversion['config'][$i]['valuetype'] = 'text';
+$modversion['config'][$i]['default'] = 'RAND()';
+$modversion['config'][$i]['options'] = array(_MI_LINKEDIN_CRAWL_SORT_RANDOM => 'RAND()', _MI_LINKEDIN_CRAWL_SORT_CREATED => '`created`', _MI_LINKEDIN_CRAWL_SORT_UPDATED => '`updated`',
+											 _MI_LINKEDIN_CRAWL_SORT_POLLED => '`polled`', _MI_LINKEDIN_CRAWL_SORT_CRAWLED => '`crawled`');
+$i++;
+$modversion['config'][$i]['name'] = 'crawlorder';
+$modversion['config'][$i]['title'] = "_MI_LINKEDIN_CRAWL_ORDER";
+$modversion['config'][$i]['description'] = "_MI_LINKEDIN_CRAWL_ORDER_DESC";
+$modversion['config'][$i]['formtype'] = 'select';
+$modversion['config'][$i]['valuetype'] = 'text';
+$modversion['config'][$i]['default'] = 'DESC';
+$modversion['config'][$i]['options'] = array(_MI_LINKEDIN_CRAWL_ORDER_DESC => 'DESC', _MI_LINKEDIN_CRAWL_ORDER_ASC => 'ASC');
 
 $i++;
 $modversion['config'][$i]['name'] = 'appKey';
@@ -263,6 +326,163 @@ $modversion['config'][$i]['description'] = "_MI_LINKEDIN_CALLBACK_URL_DESC";
 $modversion['config'][$i]['formtype'] = 'text';
 $modversion['config'][$i]['valuetype'] = 'text';
 $modversion['config'][$i]['default'] = XOOPS_URL.'/modules/linkedinbomb/callback/';
+
+$i++;
+$modversion['config'][$i]['name'] = 'user_agent';
+$modversion['config'][$i]['title'] = "_MI_LINKEDIN_USER_AGENT";
+$modversion['config'][$i]['description'] = "_MI_LINKEDIN_USER_AGENT_DESC";
+$modversion['config'][$i]['formtype'] = 'text';
+$modversion['config'][$i]['valuetype'] = 'text';
+$modversion['config'][$i]['default'] = 'Mozilla/5.0 ('.XOOPS_VERSION.'; cURL; PHP '.PHP_VERSION.') LinkedINBomb/'.$modversion['version'];
+
+$i++;
+$modversion['config'][$i]['name'] = 'curl_connect_timeout';
+$modversion['config'][$i]['title'] = "_MI_LINKEDIN_CURL_CONNECT_TIMEOUT";
+$modversion['config'][$i]['description'] = "_MI_LINKEDIN_CURL_CONNECT_TIMEOUT_DESC";
+$modversion['config'][$i]['formtype'] = 'text';
+$modversion['config'][$i]['valuetype'] = 'int';
+$modversion['config'][$i]['default'] = 11;
+
+$i++;
+$modversion['config'][$i]['name'] = 'curl_timeout';
+$modversion['config'][$i]['title'] = "_MI_LINKEDIN_CURL_TIMEOUT";
+$modversion['config'][$i]['description'] = "_MI_LINKEDIN_CURL_TIMEOUT_DESC";
+$modversion['config'][$i]['formtype'] = 'text';
+$modversion['config'][$i]['valuetype'] = 'int';
+$modversion['config'][$i]['default'] = 11;
+
+$i++;
+$modversion['config'][$i]['name'] = 'bitly_username';
+$modversion['config'][$i]['title'] = "_MI_LINKEDIN_BITLY_USERNAME";
+$modversion['config'][$i]['description'] = "_MI_LINKEDIN_BITLY_USERNAME_DESC";
+$modversion['config'][$i]['formtype'] = 'text';
+$modversion['config'][$i]['valuetype'] = 'text';
+$modversion['config'][$i]['default'] = '';
+
+$i++;
+$modversion['config'][$i]['name'] = 'bitly_apikey';
+$modversion['config'][$i]['title'] = "_MI_LINKEDIN_BITLY_APIKEY";
+$modversion['config'][$i]['description'] = "_MI_LINKEDIN_BITLY_APIKEY_DESC";
+$modversion['config'][$i]['formtype'] = 'password';
+$modversion['config'][$i]['valuetype'] = 'text';
+$modversion['config'][$i]['default'] = '';
+
+$i++;
+$modversion['config'][$i]['name'] = 'bitly_apiurl';
+$modversion['config'][$i]['title'] = "_MI_LINKEDIN_BITLY_APIURL";
+$modversion['config'][$i]['description'] = "_MI_LINKEDIN_BITLY_APIURL_DESC";
+$modversion['config'][$i]['formtype'] = 'text';
+$modversion['config'][$i]['valuetype'] = 'text';
+$modversion['config'][$i]['default'] = 'http://api.bitly.com/v3';
+
+$i++;
+$modversion['config'][$i]['name'] = 'crontype';
+$modversion['config'][$i]['title'] = '_MI_LINKEDIN_CRONTYPE';
+$modversion['config'][$i]['description'] = '_MI_LINKEDIN_CRONTYPE_DESC';
+$modversion['config'][$i]['formtype'] = 'select';
+$modversion['config'][$i]['valuetype'] = 'text';
+$modversion['config'][$i]['default'] = 'preloader';
+$modversion['config'][$i]['options'] = 	array(	_MI_LINKEDIN_CRONTYPE_PRELOADER => 'preloader', 
+												_MI_LINKEDIN_CRONTYPE_CRONTAB => 'crontab', 
+												_MI_LINKEDIN_CRONTYPE_SCHEDULER => 'scheduler'
+										);
+
+$i++;
+$modversion['config'][$i]['name'] = 'interval_of_cron';
+$modversion['config'][$i]['title'] = "_MI_LINKEDIN_INTERVAL_OF_CRON";
+$modversion['config'][$i]['description'] = "_MI_LINKEDIN_INTERVAL_OF_CRON_DESC";
+$modversion['config'][$i]['formtype'] = 'text';
+$modversion['config'][$i]['valuetype'] = 'int';
+$modversion['config'][$i]['default'] = 60;
+
+$i++;
+$modversion['config'][$i]['name'] = 'length_of_cron';
+$modversion['config'][$i]['title'] = "_MI_LINKEDIN_LENGTH_OF_CRON";
+$modversion['config'][$i]['description'] = "_MI_LINKEDIN_LENGTH_OF_CRON_DESC";
+$modversion['config'][$i]['formtype'] = 'text';
+$modversion['config'][$i]['valuetype'] = 'int';
+$modversion['config'][$i]['default'] = 30;
+
+$i++;
+$modversion['config'][$i]['name'] = 'cron_crawl';
+$modversion['config'][$i]['title'] = '_MI_LINKEDIN_CRON_CRAWL';
+$modversion['config'][$i]['description'] = '_MI_LINKEDIN_CRON_CRAWL';
+$modversion['config'][$i]['formtype'] = 'yesno';
+$modversion['config'][$i]['valuetype'] = 'int';
+$modversion['config'][$i]['default'] = true;
+$modversion['config'][$i]['options'] = 	array();
+
+mt_srand(microtime(true));
+$i++;
+$modversion['config'][$i]['name'] = 'salt';
+$modversion['config'][$i]['title'] = "_MI_LINKEDIN_SALT";
+$modversion['config'][$i]['description'] = "_MI_LINKEDIN_SALT_DESC";
+$modversion['config'][$i]['formtype'] = 'text';
+$modversion['config'][$i]['valuetype'] = 'text';
+$modversion['config'][$i]['default'] = (mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'').(mt_rand(1,9)!=5?chr(mt_rand(32,190)):'');
+
+$i++;
+$modversion['config'][$i]['name'] = 'odds_lower';
+$modversion['config'][$i]['title'] = "_MI_LINKEDIN_ODDS_LOWER";
+$modversion['config'][$i]['description'] = "_MI_LINKEDIN_ODDS_LOWER_DESC";
+$modversion['config'][$i]['formtype'] = 'text';
+$modversion['config'][$i]['valuetype'] = 'int';
+$modversion['config'][$i]['default'] = 0;
+
+$i++;
+$modversion['config'][$i]['name'] = 'odds_higher';
+$modversion['config'][$i]['title'] = "_MI_LINKEDIN_ODDS_HIGHER";
+$modversion['config'][$i]['description'] = "_MI_LINKEDIN_ODDS_HIGHER_DESC";
+$modversion['config'][$i]['formtype'] = 'text';
+$modversion['config'][$i]['valuetype'] = 'int';
+$modversion['config'][$i]['default'] = 10;
+$i++;
+$modversion['config'][$i]['name'] = 'odds_minimum';
+$modversion['config'][$i]['title'] = "_MI_LINKEDIN_ODDS_MINIMUM";
+$modversion['config'][$i]['description'] = "_MI_LINKEDIN_ODDS_MINIMUM_DESC";
+$modversion['config'][$i]['formtype'] = 'text';
+$modversion['config'][$i]['valuetype'] = 'int';
+$modversion['config'][$i]['default'] = 4;
+
+$i++;
+$modversion['config'][$i]['name'] = 'odds_maximum';
+$modversion['config'][$i]['title'] = "_MI_LINKEDIN_ODDS_MAXIMUM";
+$modversion['config'][$i]['description'] = "_MI_LINKEDIN_ODDS_MAXIMUM_DESC";
+$modversion['config'][$i]['formtype'] = 'text';
+$modversion['config'][$i]['valuetype'] = 'int';
+$modversion['config'][$i]['default'] = 7;
+
+$i++;
+$modversion['config'][$i]['name'] = 'htaccess';
+$modversion['config'][$i]['title'] = "_MI_LINKEDIN_HTACCESS";
+$modversion['config'][$i]['description'] = "_MI_LINKEDIN_HTACCESS_DESC";
+$modversion['config'][$i]['formtype'] = 'yesno';
+$modversion['config'][$i]['valuetype'] = 'int';
+$modversion['config'][$i]['default'] = 0;
+
+$i++;
+$modversion['config'][$i]['name'] = 'baseurl';
+$modversion['config'][$i]['title'] = "_MI_LINKEDIN_BASEURL";
+$modversion['config'][$i]['description'] = "_MI_LINKEDIN_BASEURL_DESC";
+$modversion['config'][$i]['formtype'] = 'text';
+$modversion['config'][$i]['valuetype'] = 'text';
+$modversion['config'][$i]['default'] = 'LINKEDIN';
+
+$i++;
+$modversion['config'][$i]['name'] = 'endofurl';
+$modversion['config'][$i]['title'] = "_MI_LINKEDIN_ENDOFURL";
+$modversion['config'][$i]['description'] = "_MI_LINKEDIN_ENDOFURL_DESC";
+$modversion['config'][$i]['formtype'] = 'text';
+$modversion['config'][$i]['valuetype'] = 'text';
+$modversion['config'][$i]['default'] = '.html';
+
+$i++;
+$modversion['config'][$i]['name'] = 'endofurl_rss';
+$modversion['config'][$i]['title'] = "_MI_LINKEDIN_ENDOFURLRSS";
+$modversion['config'][$i]['description'] = "_MI_LINKEDIN_ENDOFURLRSS_DESC";
+$modversion['config'][$i]['formtype'] = 'text';
+$modversion['config'][$i]['valuetype'] = 'text';
+$modversion['config'][$i]['default'] = '.rss';
 
 /*
 if (isset($GLOBALS['xoopsModuleConfig']['anonymous'])) {
@@ -405,37 +625,6 @@ $modversion['config'][$i]['formtype'] = 'text';
 $modversion['config'][$i]['valuetype'] = 'int';
 $modversion['config'][$i]['default'] = 20;
 
-$i++;
-$modversion['config'][$i]['name'] = 'htaccess';
-$modversion['config'][$i]['title'] = "_MI_LINKEDIN_HTACCESS";
-$modversion['config'][$i]['description'] = "_MI_LINKEDIN_HTACCESS_DESC";
-$modversion['config'][$i]['formtype'] = 'yesno';
-$modversion['config'][$i]['valuetype'] = 'int';
-$modversion['config'][$i]['default'] = 0;
-
-$i++;
-$modversion['config'][$i]['name'] = 'baseurl';
-$modversion['config'][$i]['title'] = "_MI_LINKEDIN_BASEURL";
-$modversion['config'][$i]['description'] = "_MI_LINKEDIN_BASEURL_DESC";
-$modversion['config'][$i]['formtype'] = 'text';
-$modversion['config'][$i]['valuetype'] = 'text';
-$modversion['config'][$i]['default'] = 'LINKEDIN';
-
-$i++;
-$modversion['config'][$i]['name'] = 'endofurl';
-$modversion['config'][$i]['title'] = "_MI_LINKEDIN_ENDOFURL";
-$modversion['config'][$i]['description'] = "_MI_LINKEDIN_ENDOFURL_DESC";
-$modversion['config'][$i]['formtype'] = 'text';
-$modversion['config'][$i]['valuetype'] = 'text';
-$modversion['config'][$i]['default'] = '.html';
-
-$i++;
-$modversion['config'][$i]['name'] = 'endofurl_rss';
-$modversion['config'][$i]['title'] = "_MI_LINKEDIN_ENDOFURLRSS";
-$modversion['config'][$i]['description'] = "_MI_LINKEDIN_ENDOFURLRSS_DESC";
-$modversion['config'][$i]['formtype'] = 'text';
-$modversion['config'][$i]['valuetype'] = 'text';
-$modversion['config'][$i]['default'] = '.rss';
 
 $i++;
 $modversion['config'][$i]['name'] = 'save_bomb';
@@ -461,18 +650,6 @@ $modversion['config'][$i]['formtype'] = 'yesno';
 $modversion['config'][$i]['valuetype'] = 'int';
 $modversion['config'][$i]['default'] = true;
 
-$i++;
-$modversion['config'][$i]['name'] = 'logdrops';
-$modversion['config'][$i]['title'] = '_MI_LINKEDIN_LOGDROPS';
-$modversion['config'][$i]['description'] = '_MI_LINKEDIN_LOGDROPS_DESC';
-$modversion['config'][$i]['formtype'] = 'select';
-$modversion['config'][$i]['valuetype'] = 'int';
-$modversion['config'][$i]['default'] = (60*60*24*7*4*1);
-$modversion['config'][$i]['options'] = array(_MI_LINKEDIN_LOGDROPS_24HOURS => (60*60*24), _MI_LINKEDIN_LOGDROPS_1WEEK => (60*60*24*7), _MI_LINKEDIN_LOGDROPS_FORTNIGHT => (60*60*24*7*2), 
-											 _MI_LINKEDIN_LOGDROPS_1MONTH => (60*60*24*7*4*1), _MI_LINKEDIN_LOGDROPS_2MONTHS => (60*60*24*7*4*2), _MI_LINKEDIN_LOGDROPS_3MONTHS => (60*60*24*7*4*3), 
-											 _MI_LINKEDIN_LOGDROPS_4MONTHS => (60*60*24*7*4*4), _MI_LINKEDIN_LOGDROPS_5MONTHS => (60*60*24*7*4*5), _MI_LINKEDIN_LOGDROPS_6MONTHS => (60*60*24*7*4*6),
-											 _MI_LINKEDIN_LOGDROPS_12MONTHS => (60*60*24*7*4*12), _MI_LINKEDIN_LOGDROPS_24MONTHS => (60*60*24*7*4*24));
-											 
 $i++;
 $modversion['config'][$i]['name'] = 'scheduler_usernames';
 $modversion['config'][$i]['title'] = "_MI_LINKEDIN_SCHEDULER_USERNAMES";
@@ -556,53 +733,7 @@ $modversion['config'][$i]['formtype'] = 'password';
 $modversion['config'][$i]['valuetype'] = 'text';
 $modversion['config'][$i]['default'] = '';
 
-$i++;
-$modversion['config'][$i]['name'] = 'bitly_username';
-$modversion['config'][$i]['title'] = "_MI_LINKEDIN_BITLY_USERNAME";
-$modversion['config'][$i]['description'] = "_MI_LINKEDIN_BITLY_USERNAME_DESC";
-$modversion['config'][$i]['formtype'] = 'text';
-$modversion['config'][$i]['valuetype'] = 'text';
-$modversion['config'][$i]['default'] = '';
 
-$i++;
-$modversion['config'][$i]['name'] = 'bitly_apikey';
-$modversion['config'][$i]['title'] = "_MI_LINKEDIN_BITLY_APIKEY";
-$modversion['config'][$i]['description'] = "_MI_LINKEDIN_BITLY_APIKEY_DESC";
-$modversion['config'][$i]['formtype'] = 'password';
-$modversion['config'][$i]['valuetype'] = 'text';
-$modversion['config'][$i]['default'] = '';
-
-$i++;
-$modversion['config'][$i]['name'] = 'bitly_apiurl';
-$modversion['config'][$i]['title'] = "_MI_LINKEDIN_BITLY_APIURL";
-$modversion['config'][$i]['description'] = "_MI_LINKEDIN_BITLY_APIURL_DESC";
-$modversion['config'][$i]['formtype'] = 'text';
-$modversion['config'][$i]['valuetype'] = 'text';
-$modversion['config'][$i]['default'] = 'http://api.bitly.com/v3';
-
-$i++;
-$modversion['config'][$i]['name'] = 'user_agent';
-$modversion['config'][$i]['title'] = "_MI_LINKEDIN_USER_AGENT";
-$modversion['config'][$i]['description'] = "_MI_LINKEDIN_USER_AGENT_DESC";
-$modversion['config'][$i]['formtype'] = 'text';
-$modversion['config'][$i]['valuetype'] = 'text';
-$modversion['config'][$i]['default'] = 'Mozilla/5.0 ('.XOOPS_VERSION.'; cURL; PHP '.PHP_VERSION.') TwitterBomb/'.$modversion['version'];
-
-$i++;
-$modversion['config'][$i]['name'] = 'curl_connect_timeout';
-$modversion['config'][$i]['title'] = "_MI_LINKEDIN_CURL_CONNECT_TIMEOUT";
-$modversion['config'][$i]['description'] = "_MI_LINKEDIN_CURL_CONNECT_TIMEOUT_DESC";
-$modversion['config'][$i]['formtype'] = 'text';
-$modversion['config'][$i]['valuetype'] = 'int';
-$modversion['config'][$i]['default'] = 11;
-
-$i++;
-$modversion['config'][$i]['name'] = 'curl_timeout';
-$modversion['config'][$i]['title'] = "_MI_LINKEDIN_CURL_TIMEOUT";
-$modversion['config'][$i]['description'] = "_MI_LINKEDIN_CURL_TIMEOUT_DESC";
-$modversion['config'][$i]['formtype'] = 'text';
-$modversion['config'][$i]['valuetype'] = 'int';
-$modversion['config'][$i]['default'] = 11;
 $i++;
 $modversion['config'][$i]['name'] = 'keep_trend_for';
 $modversion['config'][$i]['title'] = '_MI_LINKEDIN_KEEPTRENDFOR';
@@ -627,27 +758,6 @@ $modversion['config'][$i]['default'] = 'current';
 $modversion['config'][$i]['options'] = array(_MI_LINKEDIN_TREND_STANDARD => '', _MI_LINKEDIN_TREND_CURRENT => 'current', 
 											 _MI_LINKEDIN_TREND_DAILY => 'daily', _MI_LINKEDIN_TREND_WEEKLY => 'weekly');
 											 
-$i++;
-$modversion['config'][$i]['name'] = 'crontype';
-$modversion['config'][$i]['title'] = '_MI_LINKEDIN_CRONTYPE';
-$modversion['config'][$i]['description'] = '_MI_LINKEDIN_CRONTYPE_DESC';
-$modversion['config'][$i]['formtype'] = 'select';
-$modversion['config'][$i]['valuetype'] = 'text';
-$modversion['config'][$i]['default'] = 'rss';
-$modversion['config'][$i]['options'] = 	array(	_MI_LINKEDIN_CRONTYPE_RSS => 'rss', 
-												_MI_LINKEDIN_CRONTYPE_PRELOADER => 'preloader', 
-												_MI_LINKEDIN_CRONTYPE_CRONTAB => 'crontab', 
-												_MI_LINKEDIN_CRONTYPE_SCHEDULER => 'scheduler'
-										);
-
-$i++;
-$modversion['config'][$i]['name'] = 'cron_follow';
-$modversion['config'][$i]['title'] = '_MI_LINKEDIN_CRON_FOLLOW';
-$modversion['config'][$i]['description'] = '_MI_LINKEDIN_CRON_FOLLOW';
-$modversion['config'][$i]['formtype'] = 'yesno';
-$modversion['config'][$i]['valuetype'] = 'int';
-$modversion['config'][$i]['default'] = true;
-$modversion['config'][$i]['options'] = 	array();
 
 $i++;
 $modversion['config'][$i]['name'] = 'cron_gather';
@@ -695,13 +805,7 @@ $modversion['config'][$i]['valuetype'] = 'int';
 $modversion['config'][$i]['default'] = true;
 $modversion['config'][$i]['options'] = 	array();
 
-$i++;
-$modversion['config'][$i]['name'] = 'interval_of_cron';
-$modversion['config'][$i]['title'] = "_MI_LINKEDIN_INTERVAL_OF_CRON";
-$modversion['config'][$i]['description'] = "_MI_LINKEDIN_INTERVAL_OF_CRON_DESC";
-$modversion['config'][$i]['formtype'] = 'text';
-$modversion['config'][$i]['valuetype'] = 'int';
-$modversion['config'][$i]['default'] = 60;
+
 
 $i++;
 $modversion['config'][$i]['name'] = 'tweets_per_session';
@@ -804,43 +908,6 @@ $modversion['config'][$i]['formtype'] = 'text';
 $modversion['config'][$i]['valuetype'] = 'int';
 $modversion['config'][$i]['default'] = 10;
 
-$i++;
-$modversion['config'][$i]['name'] = 'salt';
-$modversion['config'][$i]['title'] = "_MI_LINKEDIN_SALT";
-$modversion['config'][$i]['description'] = "_MI_LINKEDIN_SALT_DESC";
-$modversion['config'][$i]['formtype'] = 'text';
-$modversion['config'][$i]['valuetype'] = 'text';
-$modversion['config'][$i]['default'] = (mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'').(mt_rand(0,4)<>2?chr(mt_rand(32,190)):'');
 
-$i++;
-$modversion['config'][$i]['name'] = 'odds_lower';
-$modversion['config'][$i]['title'] = "_MI_LINKEDIN_ODDS_LOWER";
-$modversion['config'][$i]['description'] = "_MI_LINKEDIN_ODDS_LOWER_DESC";
-$modversion['config'][$i]['formtype'] = 'text';
-$modversion['config'][$i]['valuetype'] = 'int';
-$modversion['config'][$i]['default'] = 0;
-
-$i++;
-$modversion['config'][$i]['name'] = 'odds_higher';
-$modversion['config'][$i]['title'] = "_MI_LINKEDIN_ODDS_HIGHER";
-$modversion['config'][$i]['description'] = "_MI_LINKEDIN_ODDS_HIGHER_DESC";
-$modversion['config'][$i]['formtype'] = 'text';
-$modversion['config'][$i]['valuetype'] = 'int';
-$modversion['config'][$i]['default'] = 10;
-$i++;
-$modversion['config'][$i]['name'] = 'odds_minimum';
-$modversion['config'][$i]['title'] = "_MI_LINKEDIN_ODDS_MINIMUM";
-$modversion['config'][$i]['description'] = "_MI_LINKEDIN_ODDS_MINIMUM_DESC";
-$modversion['config'][$i]['formtype'] = 'text';
-$modversion['config'][$i]['valuetype'] = 'int';
-$modversion['config'][$i]['default'] = 4;
-
-$i++;
-$modversion['config'][$i]['name'] = 'odds_maximum';
-$modversion['config'][$i]['title'] = "_MI_LINKEDIN_ODDS_MAXIMUM";
-$modversion['config'][$i]['description'] = "_MI_LINKEDIN_ODDS_MAXIMUM_DESC";
-$modversion['config'][$i]['formtype'] = 'text';
-$modversion['config'][$i]['valuetype'] = 'int';
-$modversion['config'][$i]['default'] = 7;
 */
 ?>

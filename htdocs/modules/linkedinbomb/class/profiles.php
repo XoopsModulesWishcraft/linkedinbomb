@@ -39,12 +39,12 @@ class LinkedinbombProfiles extends XoopsObject
         $this->initVar('patents_ids', XOBJ_DTYPE_ARRAY, array(), false);
         $this->initVar('languages_ids', XOBJ_DTYPE_ARRAY, array(), false);
         $this->initVar('skills_ids', XOBJ_DTYPE_ARRAY, array(), false);
-        $this->initVar('certifications_ids', XOBJ_DTYPE_ARRAY, array(), false);
+        $this->initVar('companies_ids', XOBJ_DTYPE_ARRAY, array(), false);
         $this->initVar('educations_ids', XOBJ_DTYPE_ARRAY, array(), false);
         $this->initVar('courses_ids', XOBJ_DTYPE_ARRAY, array(), false);
         $this->initVar('volunteer_ids', XOBJ_DTYPE_ARRAY, array(), false);
         $this->initVar('three-current-positions_ids', XOBJ_DTYPE_ARRAY, array(), false);
-        $this->initVar('three-past-positions_ids ', XOBJ_DTYPE_ARRAY, array(), false);
+        $this->initVar('three-past-positions_ids', XOBJ_DTYPE_ARRAY, array(), false);
         $this->initVar('summary', XOBJ_DTYPE_OTHER, '', false);
         $this->initVar('specialties', XOBJ_DTYPE_OTHER, '', false);
         $this->initVar('proposal-comments', XOBJ_DTYPE_OTHER, '', false);
@@ -59,7 +59,7 @@ class LinkedinbombProfiles extends XoopsObject
         $this->initVar('date-of-birth', XOBJ_DTYPE_TXTBOX, '', false, 10);
         $this->initVar('main-address', XOBJ_DTYPE_TXTBOX, '', false, 255);
         $this->initVar('picture-url', XOBJ_DTYPE_URL, '', false, 500);
-        $this->initVar('site-standard-profile-request', XOBJ_DTYPE_URL, '', false, 500);
+        $this->initVar('site-standard-profile-request', XOBJ_DTYPE_ARRAY, array(), false, 500);
         $this->initVar('api-standard-profile-request_ids', XOBJ_DTYPE_ARRAY, array(), false);
         $this->initVar('public-profile-url', XOBJ_DTYPE_URL, '', false, 500);
         $this->initVar('searched', XOBJ_DTYPE_INT, null, false); // Removed Unicode in 2.10
@@ -81,32 +81,41 @@ class LinkedinbombProfiles extends XoopsObject
     }
 
     function setVar($field, $value) {
-    	switch ($this->vars[$field]['data_type']) {
-    		case XOBJ_DTYPE_ARRAY:
-    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
-    				parent::setVar($field, $value);
-    			break;
-    		default:
-    			if (md5($value)!=md5($this->getVar($field)))
-    				parent::setVar($field, $value);
-    			break;
-    	}
+    	if (isset($this->vars[$field]))
+	    	switch ($this->vars[$field]['data_type']) {
+	    		case XOBJ_DTYPE_ARRAY:
+	    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
+	    				parent::setVar($field, $value);
+	    			break;
+	    		default:
+	    			if (is_array($value))
+		    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
+		    				parent::setVar($field, json_encode($value));
+		    		elseif (md5($value)!=md5($this->getVar($field)))
+	    				parent::setVar($field, $value);
+	    			break;
+	    	}
     }
             
     function setVars($arr, $not_gpc=false) {
     	foreach($arr as $field => $value) {
-    		switch ($this->vars[$field]['data_type']) {
-    			case XOBJ_DTYPE_ARRAY:
-    				if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
-    					parent::setVar($field, $value);
-    				break;
-    			default:
-    				if (md5($value)!=md5($this->getVar($field)))
-    					parent::setVar($field, $value);
-    				break;
-    		}
+    		if (isset($this->vars[$field]))
+	    		switch ($this->vars[$field]['data_type']) {
+	    			case XOBJ_DTYPE_ARRAY:
+	    				if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
+	    					parent::setVar($field, $value);
+	    				break;
+	    			default:
+		    			if (is_array($value))
+			    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
+			    				parent::setVar($field, json_encode($value));
+			    		elseif (md5($value)!=md5($this->getVar($field)))
+		    				parent::setVar($field, $value);
+	    				break;
+	    		}
     	}	
     }   
+    
     function getCountryID($code) {
     	$countries_handler = xoops_getmodulehandler('countries', 'linkedinbomb');
     	$criteria = new Criteria('`code`', strtoupper($code));
@@ -207,63 +216,60 @@ class LinkedinbombProfiles extends XoopsObject
     		$aspr_idb = $GLOBALS['aspr_id'];
     	}
     	$connections_handler = xoops_getmodulehandler('connections', 'linkedinbomb');
-    	if (in_array('person', array_keys($data))) {
-    		if (isset($data['person'][0])) {
-    			foreach($data['person'] as $value) {
-    				$id = $this->getPersonID($value);
-    				if ($connecting_person_id!=0&&isset($value)&&count($value)>0) {
-		    			$criteria = new CriteriaCompo();
-		    			if ($this->getVar('profile_id')!=0)
-		    				$criteria->add(new Criteria('`request_profile_id`', $this->getVar('profile_id')));
-		    			if ($this->getVar('person_id')!=0)
-		    				$criteria->add(new Criteria('`request_person_id`', $this->getVar('person_id')));
-		    			if ($connecting_person_id!=0)
-		    				$criteria->add(new Criteria('`connection_person_id`', $connecting_person_id));
-		    			if ($id!=0)
-		    				$criteria->add(new Criteria('`person_id`', $id));
-    					$connection = $connections_handler->getByCriteria($criteria);
-    					$connection->setVar('request_profile_id', $this->getVar('profile_id'));
-    					$connection->setVar('request_person_id', $this->getVar('person_id'));
-    					$connection->setVar('connection_person_id', $connecting_person_id);
-    					$connection->setVar('person_id', $id);
-    					$connection->setVar('connection_aspr_id', $aspr_idb);
-    					$connection->setVar('aspr_id', $GLOBALS['aspr_id']);
-    					$conn_ids[] = $connections_handler->insert($connection, true);
-    				}
-    				if (in_array('connection', array_keys($values))) {
-    					$this->scanForPersons($value['connection'], $id , $aspr_idb );
-    				}
-    			}
-    		} elseif (isset($data['person']['id'])) {
-    			$id = $this->getPersonID($data['person']);
-    			if ($connecting_person_id!=0&&isset($value)&&count($value)>0) {
-		    		$criteria = new CriteriaCompo();
-		    		if ($this->getVar('profile_id')!=0)
-		    			$criteria->add(new Criteria('`request_profile_id`', $this->getVar('profile_id')));
-		    		if ($this->getVar('person_id')!=0)
-		    			$criteria->add(new Criteria('`request_person_id`', $this->getVar('person_id')));
-		    		if ($connecting_person_id!=0)
-		    			$criteria->add(new Criteria('`connection_person_id`', $connecting_person_id));
-		    		if ($id!=0)
-		    			$criteria->add(new Criteria('`person_id`', $id));
-    				$connection = $connections_handler->getByCriteria($criteria);
-    				$connection->setVar('request_profile_id', $this->getVar('profile_id'));
-    				$connection->setVar('request_person_id', $this->getVar('person_id'));
-    				$connection->setVar('connection_person_id', $connecting_person_id);
-    				$connection->setVar('person_id', $id);
-    				$connection->setVar('connection_aspr_id', $aspr_idb);
-    				$connection->setVar('aspr_id', $GLOBALS['aspr_id']);
-    				$conn_ids[] = $connections_handler->insert($connection, true);
-    			}
-    			if (in_array('connection', array_keys($data['person']))) {
-    				$this->scanForPersons($data['person']['connection'], $id , $aspr_idb );
-    			}
-    		}
-    	} else {
-    		foreach($data as $key => $value) {
-    			$this->scanForPersons($data[$key], 0, $aspr_idb);
-    		}
- 		}
+    	if (is_array($data))
+	    	if (in_array('person', array_keys($data))) {
+	    		if (isset($data['person'][0])) {
+	    			foreach($data['person'] as $value) {
+	    				$id = $this->getPersonID($value);
+	    				if ($connecting_person_id!=0&&isset($value)&&count($value)>0) {
+			    			$criteria = new CriteriaCompo();
+			    			if ($this->getVar('profile_id')!=0)
+			    				$criteria->add(new Criteria('`request_profile_id`', $this->getVar('profile_id')));
+			    			if ($this->getVar('person_id')!=0)
+			    				$criteria->add(new Criteria('`request_person_id`', $this->getVar('person_id')));
+			    			if ($connecting_person_id!=0)
+			    				$criteria->add(new Criteria('`connection_person_id`', $connecting_person_id));
+			    			if ($id!=0)
+			    				$criteria->add(new Criteria('`person_id`', $id));
+	    					$connection = $connections_handler->getByCriteria($criteria);
+	    					$connection->setVar('request_profile_id', $this->getVar('profile_id'));
+	    					$connection->setVar('request_person_id', $this->getVar('person_id'));
+	    					$connection->setVar('connection_person_id', $connecting_person_id);
+	    					$connection->setVar('person_id', $id);
+	    					$connection->setVar('connection_aspr_id', $aspr_idb);
+	    					$connection->setVar('aspr_id', $GLOBALS['aspr_id']);
+	    					$conn_ids[] = $connections_handler->insert($connection, true);
+	    				}
+	    				$this->scanForPersons($value, 0, $aspr_idb);
+	    			}
+	    		} elseif (isset($data['person']['id'])) {
+	    			$id = $this->getPersonID($data['person']);
+	    			if ($connecting_person_id!=0&&isset($value)&&count($value)>0) {
+			    		$criteria = new CriteriaCompo();
+			    		if ($this->getVar('profile_id')!=0)
+			    			$criteria->add(new Criteria('`request_profile_id`', $this->getVar('profile_id')));
+			    		if ($this->getVar('person_id')!=0)
+			    			$criteria->add(new Criteria('`request_person_id`', $this->getVar('person_id')));
+			    		if ($connecting_person_id!=0)
+			    			$criteria->add(new Criteria('`connection_person_id`', $connecting_person_id));
+			    		if ($id!=0)
+			    			$criteria->add(new Criteria('`person_id`', $id));
+	    				$connection = $connections_handler->getByCriteria($criteria);
+	    				$connection->setVar('request_profile_id', $this->getVar('profile_id'));
+	    				$connection->setVar('request_person_id', $this->getVar('person_id'));
+	    				$connection->setVar('connection_person_id', $connecting_person_id);
+	    				$connection->setVar('person_id', $id);
+	    				$connection->setVar('connection_aspr_id', $aspr_idb);
+	    				$connection->setVar('aspr_id', $GLOBALS['aspr_id']);
+	    				$conn_ids[] = $connections_handler->insert($connection, true);
+	    			}
+	    			$this->scanForPersons($data['person'], 0, $aspr_idb);
+	    		}
+	    	} else {
+	    		foreach($data as $key => $value) {
+	    			$this->scanForPersons($data[$key], 0, $aspr_idb);
+	    		}
+	 		}
     }
     
     function getPersonID($data, $as_object = false) {
@@ -272,8 +278,8 @@ class LinkedinbombProfiles extends XoopsObject
     	$person = $persons_handler->getByCriteria($criteria);
     	$person->setVars($data);
     	$person = $persons_handler->get($person_id = $persons_handler->insert($person, true));    	
-    	if (isset($data['site-standard-profile-request']['url'])) {
-    		$person->setVar('site-standard-profile-request', $data['site-standard-profile-request']['url']);
+    	if (isset($data['site-standard-profile-request']['url'][0])) {
+    		$person->setVar('site-standard-profile-request', $data['site-standard-profile-request']['url'][0]);
     	}
     	if (isset($data['location'])) {
     		$person->setVar('location_id', $this->getLocationID($data['location'], $person, $person->getVar('location_id'))); 
@@ -479,7 +485,7 @@ class LinkedinbombProfiles extends XoopsObject
 		if (isset($data['title']))
 			$criteria->add(new Criteria('`title`', $data['title']));
 		if (isset($data['company']))
-			$criteria->add(new Criteria('`company_id`', $company_id = $this->getCompanyID($data['company'])));
+			$criteria->add(new Criteria('`company_id`', $company_id = $this->getCompanyID($data['company'], $person)));
 		if ($person->getVar('person_id')!=0)
     		$criteria->add(new Criteria('`person_id`', $person->getVar('person_id')));
     	if ($person->getVar('profile_id')!=0)
@@ -671,7 +677,10 @@ class LinkedinbombProfiles extends XoopsObject
 		$publication->setVars($data);
 		$publication->setVar('profile_id', $person->getVar('profile_id'));
 		$publication->setVar('person_id', $person->getVar('person_id'));
-		$publication->setVar('date', $data['date']['year'].'/'.$data['date']['month'].'/'.$data['date']['day']);
+		if (isset($data['date'])&&is_array($data['date']))
+			$publication->setVar('date', $data['date']['year'].'/'.$data['date']['month'].'/'.$data['date']['day']);
+		elseif (isset($data['date']))
+			$publication->setVar('date', $data['date']);
 		$publication = $profiles_publications_handler->get($publication_id = $profiles_publications_handler->insert($publication, true));
 		if (isset($data['authors']))
 			$publication->setVar('authors_ids', $this->getPublicationAuthorsIDS($data['authors'], $person, $publication_id, array()));
@@ -911,8 +920,12 @@ class LinkedinbombProfiles extends XoopsObject
     	$criteria = new CriteriaCompo();
 		if (isset($data['language']))
 			$criteria->add(new Criteria('`language_id`', $language_id = $this->getLanguageID($data['language'], $person)));
+		else 
+			$language_id = 0;
 		if (isset($data['proficiency']))
-			$criteria->add(new Criteria('`proficiency_id`', $proficiency_id = $this->getProficienciesID($data['proficiency'], $person), 'LIKE'));			
+			$criteria->add(new Criteria('`proficiency_id`', $proficiency_id = $this->getProficienciesID($data['proficiency'], $person), 'LIKE'));
+		else 
+			$proficiency_id = 0;			
 		if ($person->getVar('profile_id'))
 			$criteria->add(new Criteria('`profile_id`', $person->getVar('profile_id')));			
 		$language = $profiles_languages_handler->getByCriteria($criteria);
@@ -982,10 +995,16 @@ class LinkedinbombProfiles extends XoopsObject
     	$criteria = new CriteriaCompo();
     	if (isset($data['years']))
 			$criteria->add(new Criteria('`years_id`', $years_id = $this->getYearsID($data['years'], $person)));
+		else 
+			$years_id = 0;
 		if (isset($data['skill']))
 			$criteria->add(new Criteria('`skill_id`', $skill_id = $this->getSkillID($data['skill'], $person)));
+		else 
+			$skill_id = 0;
 		if (isset($data['proficiency']))
-			$criteria->add(new Criteria('`proficiency_id`', $proficiency_id = $this->getProficienciesID($data['proficiency'], $person), 'LIKE'));			
+			$criteria->add(new Criteria('`proficiency_id`', $proficiency_id = $this->getProficienciesID($data['proficiency'], $person), 'LIKE'));
+		else 	
+			$proficiency_id = 0;			
 		if ($person->getVar('profile_id'))
 			$criteria->add(new Criteria('`profile_id`', $person->getVar('profile_id')));			
 		$skill = $profiles_skills_handler->getByCriteria($criteria);
@@ -1057,7 +1076,7 @@ class LinkedinbombProfiles extends XoopsObject
     }
 
     function getCertificationsID($data, $person) {
-    	$profiles_certifications_handler = xoops_getmodulehandler('profiles_certifications', 'linkedinbomb');
+    	$profiles_companies_handler = xoops_getmodulehandler('profiles_companies', 'linkedinbomb');
     	$criteria = new CriteriaCompo();
 		if (isset($data['id']))
 			$criteria->add(new Criteria('`id`', $data['id'], 'LIKE'));
@@ -1065,13 +1084,13 @@ class LinkedinbombProfiles extends XoopsObject
 			$criteria->add(new Criteria('`name`', $data['name'], 'LIKE'));			
 		if ($person->getVar('profile_id'))
 			$criteria->add(new Criteria('`profile_id`', $person->getVar('profile_id')));			
-		$certification = $profiles_certifications_handler->getByCriteria($criteria);
+		$certification = $profiles_companies_handler->getByCriteria($criteria);
 		$certification->setVars($data);
 		if (isset($data['authority']))
 			$certification->setVar('authority_id', $this->getAuthoritiesID($data['authority'], $person));
 		$certification->setVar('profile_id', $person->getVar('profile_id'));
 		$certification->setVar('person_id', $person->getVar('person_id'));
-		return $profiles_certifications_handler->insert($certification, true);
+		return $profiles_companies_handler->insert($certification, true);
     }
 
     function getAuthoritiesID($data, $person) {
@@ -1491,8 +1510,8 @@ class LinkedinbombProfiles extends XoopsObject
     			case 'skills':
     				$this->setVar('skills_ids', $this->getSkillsIDS($value, $person, array()));
     				break;     				
-    			case 'certifications':
-    				$this->setVar('certifications_ids', $this->getCertificationsIDS($value, $person, array()));
+    			case 'companies':
+    				$this->setVar('companies_ids', $this->getCertificationsIDS($value, $person, array()));
     				break;
     			case 'educations':
     				$this->setVar('educations_ids', $this->getEducationsIDS($value, $person, array()));
@@ -1526,6 +1545,7 @@ class LinkedinbombProfiles extends XoopsObject
     				break;	
     		}	
     	}
+    	$this->setVar('polled', time());
     	return $this;
     }
     
@@ -1553,8 +1573,12 @@ class LinkedinbombProfiles extends XoopsObject
 		}
     }
     
-    function toArray() {
-    	$ret = parent::toArray();
+    function toArray($include_person=false, $u=0) {
+    	$ret = array();
+    	foreach(parent::toArray() as $field => $value) {
+    		$ret[str_replace('-', '_', $field)] = $value;
+    	}
+    	
     	if (isset($ret['created'])&&$ret['created']>0) {
     		$ret['created'] = date(_DATESTRING, $ret['created']);
     	}
@@ -1569,6 +1593,119 @@ class LinkedinbombProfiles extends XoopsObject
     			$ret['form'][$field] = $form[$field]->render();
     		}
     	} 
+
+    	if ($include_person=true) {
+			$persons_handler = xoops_getmodulehandler('persons', 'linkedinbomb');
+		    if ($persons = $persons_handler->get($this->getVar('person_id'))) {
+		    	$ret['person'] = $persons->toArray(true);
+		    }
+    	}
+    	
+    	$locations_handler = xoops_getmodulehandler('locations', 'linkedinbomb');
+	    if ($locations = $locations_handler->get($this->getVar('location_id'))) {
+	    	$ret['location'] = $locations->toArray(true);
+	    }
+
+    	$criteria = new Criteria('profile_id', $ret['profile_id']);
+		$profiles_certifications_handler = xoops_getmodulehandler('profiles_certifications', 'linkedinbomb');
+	    if ($certifications = $profiles_certifications_handler->getObjects($criteria, true)) {
+	    	foreach($certifications as $certification_id => $certification) {
+	    		$ret['certifications'][$certification_id] = $certification->toArray();
+	    	}
+	    }
+
+	    $profiles_companies_handler = xoops_getmodulehandler('profiles_companies', 'linkedinbomb');
+    	if ($companies = $profiles_companies_handler->getObjects($criteria, true)) {
+	    	foreach($companies as $company_id => $company) {
+	    		$ret['companies'][$company_id] = $company->toArray();
+	    	}
+	    }
+	    
+	    $profiles_courses_handler = xoops_getmodulehandler('profiles_courses', 'linkedinbomb');
+    	if ($courses = $profiles_courses_handler->getObjects($criteria, true)) {
+	    	foreach($courses as $course_id => $course) {
+	    		$ret['courses'][$course_id] = $course->toArray();
+	    	}
+	    }
+	    
+	    $profiles_educations_handler = xoops_getmodulehandler('profiles_educations', 'linkedinbomb');
+        if ($educations = $profiles_educations_handler->getObjects($criteria, true)) {
+	    	foreach($educations as $education_id => $education) {
+	    		$ret['educations'][$education_id] = $education->toArray();
+	    	}
+	    }
+	    
+	    $profiles_ims_handler = xoops_getmodulehandler('profiles_ims', 'linkedinbomb');
+        if ($ims = $profiles_ims_handler->getObjects($criteria, true)) {
+	    	foreach($ims as $im_id => $im) {
+	    		$ret['ims'][$im_id] = $im->toArray();
+	    	}
+	    }	    
+
+	    $profiles_languages_handler = xoops_getmodulehandler('profiles_languages', 'linkedinbomb');
+        if ($languages = $profiles_languages_handler->getObjects($criteria, true)) {
+	    	foreach($languages as $language_id => $language) {
+	    		$ret['languages'][$language_id] = $language->toArray();
+	    	}
+	    }
+	    	    
+	    $profiles_patents_handler = xoops_getmodulehandler('profiles_patents', 'linkedinbomb');
+	    if ($patents = $profiles_patents_handler->getObjects($criteria, true)) {
+	    	foreach($patents as $patent_id => $patent) {
+	    		$ret['patents'][$patent_id] = $patent->toArray();
+	    	}
+	    }
+	    
+	    $profiles_phones_handler = xoops_getmodulehandler('profiles_phones', 'linkedinbomb');
+        if ($phones = $profiles_phones_handler->getObjects($criteria, true)) {
+	    	foreach($phones as $phone_id => $phone) {
+	    		$ret['phones'][$phone_id] = $phone->toArray();
+	    	}
+	    }	 
+	       
+	    $profiles_positions_handler = xoops_getmodulehandler('profiles_positions', 'linkedinbomb');
+        if ($positions = $profiles_positions_handler->getObjects($criteria, true)) {
+	    	foreach($positions as $position_id => $position) {
+	    		$ret['positions'][$position_id] = $position->toArray();
+	    	}
+	    }	 
+	       
+	    $profiles_providers_handler = xoops_getmodulehandler('profiles_providers', 'linkedinbomb');
+        if ($providers = $profiles_providers_handler->getObjects($criteria, true)) {
+	    	foreach($providers as $provider_id => $provider) {
+	    		$ret['providers'][$provider_id] = $provider->toArray();
+	    	}
+	    }
+	    
+    
+	    $profiles_publications_handler = xoops_getmodulehandler('profiles_publications', 'linkedinbomb');
+        if ($publications = $profiles_publications_handler->getObjects($criteria, true)) {
+	    	foreach($publications as $publication_id => $publication) {
+	    		$ret['publications'][$publication_id] = $publication->toArray();
+	    	}
+	    }	 
+	       
+	    $profiles_recommendations_handler = xoops_getmodulehandler('profiles_recommendations', 'linkedinbomb');
+        if ($recommendations = $profiles_recommendations_handler->getObjects($criteria, true)) {
+	    	foreach($recommendations as $recommendation_id => $recommendation) {
+	    		$ret['recommendations'][$recommendation_id] = $recommendation->toArray();
+	    	}
+	    }	 
+	       
+	    $profiles_skills_handler = xoops_getmodulehandler('profiles_skills', 'linkedinbomb');
+        if ($skills = $profiles_skills_handler->getObjects($criteria, true)) {
+	    	foreach($skills as $skill_id => $skill) {
+	    		$ret['skills'][$skill_id] = $skill->toArray();
+	    	}
+	    }	 
+	       
+	    $profiles_volunteer_handler = xoops_getmodulehandler('profiles_volunteer', 'linkedinbomb');
+        if ($volunteers = $profiles_volunteer_handler->getObjects($criteria, true)) {
+	    	foreach($volunteers as $volunteer_id => $volunteer) {
+	    		$ret['volunteer'][$volunteer_id] = $volunteer->toArray();
+	    	}
+	    }	    
+	    
     	return $ret;
     }
 
@@ -1607,7 +1744,7 @@ class LinkedinbombProfilesHandler extends XoopsPersistableObjectHandler
     		$criteria = new CriteriaCompo();
     		foreach($object->vars as $field => $values) {
     			if (!in_array($field, array($this->keyName, 'searched', 'polled', 'emailed', 'sms', 'synced', 'created', 'updated')))
-    				if ($values['type']!=XOBJ_DTYPE_ARRAY)	
+    				if ($values['data_type']!=XOBJ_DTYPE_ARRAY)	
     					if (!empty($values['value'])||intval($values['value'])<>0)
     						$criteria->add(new Criteria('`'.$field.'`', $object->getVar($field)));
     		}

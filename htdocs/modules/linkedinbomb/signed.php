@@ -28,8 +28,8 @@
 		            setcookie($xoopsConfig['usercookie'], 0, -1, '/', XOOPS_COOKIE_DOMAIN, 0);
 		        }
 		    }
-		    //header('Location: ' . XOOPS_URL.'/modules/linkedinbomb/index.php');
-		    include(dirname(__FILE__).'/index.php');
+		    header('Location: ' . XOOPS_URL.'/modules/linkedinbomb/index.php');
+		    //include(dirname(__FILE__).'/index.php');
 		}
     } else {
         // request failed

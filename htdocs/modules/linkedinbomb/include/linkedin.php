@@ -639,7 +639,7 @@ class LinkedIn {
 	 * 'oauth' => The OAuth request string that was sent to LinkedIn	 
 	 * )	 
 	 */
-	protected function fetch($method, $url, $data = NULL, $parameters = array()) {
+	protected function fetch($method, $url, $data = NULL, $parameters = array(), $headers = array()) {
 			// check for cURL
 		if(!extension_loaded('curl')) {
 			// cURL not present
@@ -687,6 +687,7 @@ class LinkedIn {
 				$header[] = 'Content-Type: text/xml; charset=UTF-8';
 				curl_setopt($handle, CURLOPT_POSTFIELDS, $data);
 			}
+			$header = array_merge($header, $headers);
 			curl_setopt($handle, CURLOPT_HTTPHEADER, $header);
 	
 			// set the last url, headers
@@ -1669,7 +1670,43 @@ class LinkedIn {
 		 */
 		return $this->checkResponse(200, $response);
 	}
+
+	/**
+	 * General profile retrieval function.
+	 * 
+	 * Takes a string of parameters as input and requests profile data from the 
+	 * Linkedin Profile API. See the official documentation for $options
+	 * 'field selector' formatting:
+	 * 
+	 * http://developer.linkedin.com/docs/DOC-1014
+	 * http://developer.linkedin.com/docs/DOC-1002
+	 * 
+	 * @param str $options 
+	 *[OPTIONAL] Data retrieval options.
+	 *	 
+	 * @return arr 
+	 *Array containing retrieval success, LinkedIn response.
+	 */
+	public function extendedprofile($options = '', $url, $headers) {
+		// check passed data
+		if(!is_string($options)) {
+			// bad data passed
+			throw new LinkedInException('LinkedIn->profile(): bad data passed, $options must be of type string.');
+		}
 	
+		// construct and send the request
+		if (empty($url))
+			$query= self::_URL_API . '/v1/people/' . trim($options);
+		else 
+			$query= $url . trim($options);
+		$response = $this->fetch('GET', $query, NULL, array(), $headers);
+		
+		/**
+		 * Check for successful request (a 200 response from LinkedIn server) 
+		 * per the documentation linked in method comments above.
+		 */
+		return $this->checkResponse(200, $response);
+	}
 	/**
 	 * Manual API call method, allowing for support for un-implemented API
 	 * functionality to be supported.

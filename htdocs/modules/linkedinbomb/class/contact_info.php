@@ -32,33 +32,43 @@ class LinkedinbombContact_info extends XoopsObject
 		}
     }
 
+
     function setVar($field, $value) {
-    	switch ($this->vars[$field]['data_type']) {
-    		case XOBJ_DTYPE_ARRAY:
-    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
-    				parent::setVar($field, $value);
-    			break;
-    		default:
-    			if (md5($value)!=md5($this->getVar($field)))
-    				parent::setVar($field, $value);
-    			break;
-    	}
+    	if (isset($this->vars[$field]))
+	    	switch ($this->vars[$field]['data_type']) {
+	    		case XOBJ_DTYPE_ARRAY:
+	    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
+	    				parent::setVar($field, $value);
+	    			break;
+	    		default:
+	    			if (is_array($value))
+		    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
+		    				parent::setVar($field, $value);
+		    		elseif (md5($value)!=md5($this->getVar($field)))
+	    				parent::setVar($field, $value);
+	    			break;
+	    	}
     }
             
     function setVars($arr, $not_gpc=false) {
     	foreach($arr as $field => $value) {
-    		switch ($this->vars[$field]['data_type']) {
-    			case XOBJ_DTYPE_ARRAY:
-    				if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
-    					parent::setVar($field, $value);
-    				break;
-    			default:
-    				if (md5($value)!=md5($this->getVar($field)))
-    					parent::setVar($field, $value);
-    				break;
-    		}
+    		if (isset($this->vars[$field]))
+	    		switch ($this->vars[$field]['data_type']) {
+	    			case XOBJ_DTYPE_ARRAY:
+	    				if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
+	    					parent::setVar($field, $value);
+	    				break;
+	    			default:
+		    			if (is_array($value))
+			    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
+			    				parent::setVar($field, $value);
+			    		elseif (md5($value)!=md5($this->getVar($field)))
+		    				parent::setVar($field, $value);
+	    				break;
+	    		}
     	}	
-    }    
+    }   
+ 
     function getName() {
     	return $this->getVar('type').': '.$this->getVar('value').' ('.$this->getVar('contact-info_id').')';
     }
@@ -84,7 +94,11 @@ class LinkedinbombContact_info extends XoopsObject
     }
     
     function toArray() {
-    	$ret = parent::toArray();
+    	$ret = array();
+    	foreach(parent::toArray() as $field => $value) {
+    		$ret[str_replace('-', '_', $field)] = $value;
+    	}
+    	
     	if (isset($ret['created'])&&$ret['created']>0) {
     		$ret['created'] = date(_DATESTRING, $ret['created']);
     	}
