@@ -48,40 +48,48 @@ class LinkedinbombPersons extends XoopsObject
     }
 
     function setVar($field, $value) {
-    	if (isset($this->vars[$field]))
+    	if (isset($this->vars[$field])) {
 	    	switch ($this->vars[$field]['data_type']) {
 	    		case XOBJ_DTYPE_ARRAY:
 	    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
 	    				parent::setVar($field, $value);
 	    			break;
 	    		default:
-	    			if (is_array($value))
-		    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
+	    			if (is_array($value)) {
+		    			if (md5(serialize($value))!=md5($this->getVar($field))) {
 		    				parent::setVar($field, $value);
-		    		elseif (md5($value)!=md5($this->getVar($field)))
+		    			}
+	    			} elseif (md5($value)!=md5($this->getVar($field))) {
 	    				parent::setVar($field, $value);
+	    			}
 	    			break;
 	    	}
+    	}
     }
             
     function setVars($arr, $not_gpc=false) {
     	foreach($arr as $field => $value) {
-    		if (isset($this->vars[$field]))
+    		if (isset($this->vars[$field])) {
 	    		switch ($this->vars[$field]['data_type']) {
 	    			case XOBJ_DTYPE_ARRAY:
 	    				if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
 	    					parent::setVar($field, $value);
 	    				break;
 	    			default:
-		    			if (is_array($value))
-			    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
+			    		if (is_array($value)) {
+			    			if (md5(serialize($value))!=md5($this->getVar($field))) {
 			    				parent::setVar($field, $value);
-			    		elseif (md5($value)!=md5($this->getVar($field)))
+			    			}
+		    			} elseif (md5($value)!=md5($this->getVar($field))) {
 		    				parent::setVar($field, $value);
+		    			}
 	    				break;
 	    		}
+    		}
     	}	
     }   
+   
+    
     
     function getName() {
     	return $this->getVar('street1').', '.$this->getVar('city').', '.$this->getVar('postal-code');
@@ -155,7 +163,8 @@ class LinkedinbombPersons extends XoopsObject
     		$oauth_handler->_api->setTokenAccess($oauth->getAccessToken());
           	$oauth_handler->_api->setResponseFormat(LINKEDIN::_RESPONSE_XML);
     	} else {
-    		$oauth = $oauth_handler->get(1);
+    		if (isset($_SESSION['oauth']['linkedin']['oauth_id']))
+    			$oauth = $oauth_handler->get($_SESSION['oauth']['linkedin']['oauth_id']);
 	    	$oauth_handler->_api->setTokenAccess($oauth->getAccessToken());
 	        $oauth_handler->_api->setResponseFormat(LINKEDIN::_RESPONSE_XML);
     	}
@@ -164,7 +173,8 @@ class LinkedinbombPersons extends XoopsObject
     	} else {
     		$profile = $profiles_handler->create();
     	}
-    	if (!$aspr = $aspr_handler->getByCriteria(new Criteria('person_id', $this->getVar('person_id')))) {
+    	$aspr = $aspr_handler->getByCriteria(new Criteria('person_id', $this->getVar('person_id')));
+    	if ($aspr->isNew()) {
 			$response = $oauth_handler->_api->profile('id='.$this->getVar('id').':(id,first-name,last-name,maiden-name,formatted-name,phonetic-first-name,phonetic-last-name,formatted-phonetic-name,headline,location:(name,country:(code)),industry,distance,relation-to-viewer:(distance),last-modified-timestamp,current-share,network,connections,num-connections,num-connections-capped,summary,specialties,proposal-comments,associations,honors,interests,positions,publications,patents,languages,skills,certifications,educations,courses,volunteer,three-current-positions,three-past-positions,num-recommenders,recommendations-received,phone-numbers,im-accounts,twitter-accounts,primary-twitter-account,bound-account-types,mfeed-rss-url,following,date-of-birth,main-address,site-standard-profile-request,api-standard-profile-request:(url,headers),public-profile-url,related-profile-views,picture-url)');
     	} else {
     		$http_headers = $aspr_http_headers->getObjects(new Criteria('aspr_id', $aspr->getVar('aspr_id')));
@@ -228,13 +238,13 @@ class LinkedinbombPersonsHandler extends XoopsPersistableObjectHandler
 	    					if (!empty($values['value'])||intval($values['value'])<>0)
 	    						$criteria->add(new Criteria('`'.$field.'`', $object->getVar($field)));
 	    		}
+	    		
 	    		if ($this->getCount($criteria)>0) {
 	    			$obj = $this->getByCriteria($criteria);
-	    			if (is_object($obj)) {
+	    			if (is_object($obj)&&!$obj->isNew()) {
 	    				return $obj->getVar($this->keyName);
 	    			}
 	    		}
-	    		
 	    		$object->setVar('created', time());
 	    	} else {
 	    		if (!$object->isDirty())

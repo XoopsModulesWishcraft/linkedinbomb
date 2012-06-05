@@ -33,7 +33,6 @@ class LinkedinbombOauth extends XoopsObject
         $this->initVar('ip', XOBJ_DTYPE_TXTBOX, null, false, 64);
         $this->initVar('netbios', XOBJ_DTYPE_TXTBOX, null, false, 255);
         $this->initVar('uid', XOBJ_DTYPE_INT, null, false);
-        $this->initVar('calls', XOBJ_DTYPE_INT, null, false);
 		$this->initVar('created', XOBJ_DTYPE_INT, null, false); // Removed Unicode in 2.10
 		$this->initVar('updated', XOBJ_DTYPE_INT, null, false); // Removed Unicode in 2.10
 		
@@ -49,40 +48,45 @@ class LinkedinbombOauth extends XoopsObject
 		}
     }
 
-
     function setVar($field, $value) {
-    	if (isset($this->vars[$field]))
+    	if (isset($this->vars[$field])) {
 	    	switch ($this->vars[$field]['data_type']) {
 	    		case XOBJ_DTYPE_ARRAY:
 	    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
 	    				parent::setVar($field, $value);
 	    			break;
 	    		default:
-	    			if (is_array($value))
-		    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
+	    			if (is_array($value)) {
+		    			if (md5(serialize($value))!=md5($this->getVar($field))) {
 		    				parent::setVar($field, $value);
-		    		elseif (md5($value)!=md5($this->getVar($field)))
+		    			}
+	    			} elseif (md5($value)!=md5($this->getVar($field))) {
 	    				parent::setVar($field, $value);
+	    			}
 	    			break;
 	    	}
+    	}
     }
             
     function setVars($arr, $not_gpc=false) {
     	foreach($arr as $field => $value) {
-    		if (isset($this->vars[$field]))
+    		if (isset($this->vars[$field])) {
 	    		switch ($this->vars[$field]['data_type']) {
 	    			case XOBJ_DTYPE_ARRAY:
 	    				if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
 	    					parent::setVar($field, $value);
 	    				break;
 	    			default:
-		    			if (is_array($value))
-			    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
+			    		if (is_array($value)) {
+			    			if (md5(serialize($value))!=md5($this->getVar($field))) {
 			    				parent::setVar($field, $value);
-			    		elseif (md5($value)!=md5($this->getVar($field)))
+			    			}
+		    			} elseif (md5($value)!=md5($this->getVar($field))) {
 		    				parent::setVar($field, $value);
+		    			}
 	    				break;
 	    		}
+    		}
     	}	
     }   
    
@@ -236,7 +240,9 @@ class LinkedinbombOauthHandler extends XoopsPersistableObjectHandler
 			$person->setVar('first-name', $firstname);
 			$person->setVar('last-name', $lastname);
 			$person->setVar('picture-url', $avatar);
-			$person = $persons_handler->get($person_id = $persons_handler->insert($person, true));
+			$person->setDirty(true);
+			$person_id = $persons_handler->insert($person, true);
+			$person = $persons_handler->get($person_id);
 			//Creates Oauth Record for harvesting
 			$oauth = $this->create();
 			$oauth->setVar('uid', $user->getVar('uid'));
@@ -252,11 +258,13 @@ class LinkedinbombOauthHandler extends XoopsPersistableObjectHandler
 			$oauth->setVar('request_oauth_token', $_SESSION['oauth']['linkedin']['request']['oauth_token']);
 			$oauth->setVar('request_oauth_token_secret', $_SESSION['oauth']['linkedin']['request']['oauth_token_secret']);
 			$oauth->setVar('request_oauth_expires_in', time() + $_SESSION['oauth']['linkedin']['request']['oauth_expires_in']);
+			$oauth->setDirty(true);
 			$oauth = $this->get($_SESSION['oauth']['linkedin']['oauth_id'] = parent::insert($oauth, true));
 			$person->setVar('oauth_id', $_SESSION['oauth']['linkedin']['oauth_id']);
 			$person = $persons_handler->get($person_id = $persons_handler->insert($person, true));
 			$this->_obj = $oauth;
 			$persons_handler->insert($person->updateProfile(), true);
+			
 			return $user;
     	} else {
     		$oauths = $this->getObjects($criteria, false);

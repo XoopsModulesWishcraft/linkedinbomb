@@ -9,6 +9,7 @@
 		set_time_limit(1200);
 		$profile = linkedinbomb_object2array(new SimpleXMLElement($response['linkedin']));
 		if (!empty($profile['id'])) {
+			
 			$user = $oauth_handler->parseUserSession($profile['id'], $profile['first-name'], $profile['last-name'], $profile['picture-url']);
 
 			// Regenrate a new session id and destroy old session
