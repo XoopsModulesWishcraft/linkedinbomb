@@ -37,41 +37,48 @@ class LinkedinbombProfiles_providers extends XoopsObject
 
 
     function setVar($field, $value) {
-    	if (isset($this->vars[$field]))
+    	if (isset($this->vars[$field])) {
 	    	switch ($this->vars[$field]['data_type']) {
 	    		case XOBJ_DTYPE_ARRAY:
 	    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
 	    				parent::setVar($field, $value);
 	    			break;
 	    		default:
-	    			if (is_array($value))
-		    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
+	    			if (is_array($value)) {
+		    			if (md5(serialize($value))!=md5($this->getVar($field))) {
 		    				parent::setVar($field, $value);
-		    		elseif (md5($value)!=md5($this->getVar($field)))
+		    			}
+	    			} elseif (md5($value)!=md5($this->getVar($field))) {
 	    				parent::setVar($field, $value);
+	    			}
 	    			break;
 	    	}
+    	}
     }
             
     function setVars($arr, $not_gpc=false) {
     	foreach($arr as $field => $value) {
-    		if (isset($this->vars[$field]))
+    		if (isset($this->vars[$field])) {
 	    		switch ($this->vars[$field]['data_type']) {
 	    			case XOBJ_DTYPE_ARRAY:
 	    				if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
 	    					parent::setVar($field, $value);
 	    				break;
 	    			default:
-		    			if (is_array($value))
-			    			if (md5(serialize($value))!=md5(serialize($this->getVar($field))))
+			    		if (is_array($value)) {
+			    			if (md5(serialize($value))!=md5($this->getVar($field))) {
 			    				parent::setVar($field, $value);
-			    		elseif (md5($value)!=md5($this->getVar($field)))
+			    			}
+		    			} elseif (md5($value)!=md5($this->getVar($field))) {
 		    				parent::setVar($field, $value);
+		    			}
 	    				break;
 	    		}
+    		}
     	}	
     }   
- 
+   
+    
     function getName() {
     	return $this->getVar('street1').', '.$this->getVar('city').', '.$this->getVar('postal-code');
     }
